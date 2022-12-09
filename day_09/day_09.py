@@ -688,12 +688,28 @@ def main():
    commands = read_input()
 
    part_1(commands)
-   part_2(commands)
+   # part_2(commands)
 
 
-def move_x(direction, head, tail, seen):
+def move_x(direction, head, tails, seen):
    head[0] = head[0] - 1 if direction == 'L' else head[0] + 1
 
+   combined = [head, *tails]
+   for i in range(0, len(combined)-1):
+      (updated_head, updated_tail, seen) = update_tail_x(direction, combined[i], combined[i+1], seen)
+      combined[i] = updated_head
+      combined[i+1] = updated_tail
+
+   head = combined[0]
+   tails = combined[1:]
+
+   tail = tails[len(tails)-1]
+   seen.add((tail[0], tail[1]))
+
+   return (head, tails, seen)
+
+
+def update_tail_x(direction, head, tail, seen): 
    if is_adjacent(head, tail):
       return (head, tail, seen)
 
@@ -701,13 +717,30 @@ def move_x(direction, head, tail, seen):
    if tail[1] != head[1]:
       tail[1] = head[1]
 
-   seen.add((tail[0], tail[1]))
+   # seen.add((tail[0], tail[1]))
+
    return (head, tail, seen)
 
 
-def move_y(direction, head, tail, seen):
+def move_y(direction, head, tails, seen):
    head[1] = head[1] + 1 if direction == 'U' else head[1] - 1
 
+   combined = [head, *tails]
+   for i in range(0, len(combined)-1):
+      (updated_head, updated_tail, seen) = update_tail_y(direction, combined[i], combined[i+1], seen)
+      combined[i] = updated_head
+      combined[i+1] = updated_tail
+
+   head = combined[0]
+   tails = combined[1:]
+
+   tail = tails[len(tails)-1]
+   seen.add((tail[0], tail[1]))
+
+   return (head, tails, seen)
+
+
+def update_tail_y(direction, head, tail, seen):
    if is_adjacent(head, tail):
       return (head, tail, seen)
 
@@ -737,47 +770,50 @@ def part_1(commands):
    seen.add((0, 0))
 
    head = [0, 0]
-   tail = [0, 0]
+   # tails = [[0, 0]]
+   tails = [[0,0] for _ in range(0, 9)]
    for (direction, amount) in commands:
+      print()
+      print(direction, amount)
       if direction == 'U':
          for _ in range(0, amount):
-            (head, tail, seen) = move_y(direction, head, tail, seen)
+            (head, tails, seen) = move_y(direction, head, tails, seen)
       elif direction == 'R':
          for _ in range(0, amount):
-            (head, tail, seen) = move_x(direction, head, tail, seen)
+            (head, tails, seen) = move_x(direction, head, tails, seen)
       elif direction == 'D':
          for _ in range(0, amount):
-            (head, tail, seen) = move_y(direction, head, tail, seen)
+            (head, tails, seen) = move_y(direction, head, tails, seen)
       elif direction == 'L':
          for _ in range(0, amount):
-            (head, tail, seen) = move_x(direction, head, tail, seen)
+            (head, tails, seen) = move_x(direction, head, tails, seen)
 
 
    print('Part 1: ', len(seen))
 
 
-def part_2(commands):
-   seen = set()
-   seen.add((0, 0))
+# def part_2(commands):
+#    seen = set()
+#    seen.add((0, 0))
 
-   head = [0,0]
-   tails = [[0,0] for _ in range(0, 9)]
+#    head = [0,0]
+#    tails = [[0,0] for _ in range(0, 9)]
 
-   for (direction, amount) in commands:
-      if direction == 'U':
-         for _ in range(0, amount):
-            (head, tail, seen) = move_y(direction, head, tail, seen)
-      elif direction == 'R':
-         for _ in range(0, amount):
-            (head, tail, seen) = move_x(direction, head, tail, seen)
-      elif direction == 'D':
-         for _ in range(0, amount):
-            (head, tail, seen) = move_y(direction, head, tail, seen)
-      elif direction == 'L':
-         for _ in range(0, amount):
-            (head, tail, seen) = move_x(direction, head, tail, seen)
+#    for (direction, amount) in commands:
+#       if direction == 'U':
+#          for _ in range(0, amount):
+#             (head, tails, seen) = move_y(direction, head, tails, seen)
+#       elif direction == 'R':
+#          for _ in range(0, amount):
+#             (head, tails, seen) = move_x(direction, head, tails, seen)
+#       elif direction == 'D':
+#          for _ in range(0, amount):
+#             (head, tails, seen) = move_y(direction, head, tails, seen)
+#       elif direction == 'L':
+#          for _ in range(0, amount):
+#             (head, tails, seen) = move_x(direction, head, tails, seen)
 
-   print('Part 2: ', len(seen))
+#    print('Part 2: ', len(seen))
 
 
 def read_input():
