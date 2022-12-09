@@ -687,68 +687,99 @@ Simulate your complete series of motions on a larger rope with ten knots. How ma
 def main():
    commands = read_input()
 
-   part_1(commands)
-   # part_2(commands)
+   # part_1(commands)
+   part_2(commands)
 
 
-def move_x(direction, head, tails, seen):
+def move_x(direction, head, knots, seen):
    head[0] = head[0] - 1 if direction == 'L' else head[0] + 1
 
-   combined = [head, *tails]
+   combined = [head, *knots]
    for i in range(0, len(combined)-1):
       (updated_head, updated_tail, seen) = update_tail_x(direction, combined[i], combined[i+1], seen)
       combined[i] = updated_head
       combined[i+1] = updated_tail
 
    head = combined[0]
-   tails = combined[1:]
+   knots = combined[1:]
 
-   tail = tails[len(tails)-1]
+   print()
+   print('Moving x - ', direction)
+   print(combined)
+
+   tail = knots[len(knots)-1]
    seen.add((tail[0], tail[1]))
+   print(seen)
 
-   return (head, tails, seen)
+   return (head, knots, seen)
 
 
 def update_tail_x(direction, head, tail, seen): 
    if is_adjacent(head, tail):
       return (head, tail, seen)
 
-   tail[0] = head[0] + 1 if direction == 'L' else head[0] - 1
-   if tail[1] != head[1]:
-      tail[1] = head[1]
+   # tail[0] = head[0] + 1 if direction == 'L' else head[0] - 1
+   # if tail[1] != head[1]:
+   #    tail[1] = head[1]
 
-   # seen.add((tail[0], tail[1]))
+   if direction == 'L' and head[1] != tail[1]:
+      tail[0] += 1
+      tail[1] -= 1
+   elif direction == 'L' and head[1] == tail[1]:
+      tail[1] -= 1
+   elif direction == 'R' and head[1] != tail[1]:
+      tail[0] -= 1
+      tail[1] += 1
+   elif direction == 'R' and head[1] == tail[1]:
+      tail[1] += 1
 
    return (head, tail, seen)
 
 
-def move_y(direction, head, tails, seen):
+def move_y(direction, head, knots, seen):
    head[1] = head[1] + 1 if direction == 'U' else head[1] - 1
 
-   combined = [head, *tails]
+   combined = [head, *knots]
    for i in range(0, len(combined)-1):
       (updated_head, updated_tail, seen) = update_tail_y(direction, combined[i], combined[i+1], seen)
       combined[i] = updated_head
       combined[i+1] = updated_tail
 
+   print('Moving y - ', direction)
+   print(combined)
+
    head = combined[0]
-   tails = combined[1:]
+   knots = combined[1:]
 
-   tail = tails[len(tails)-1]
+   tail = knots[len(knots)-1]
    seen.add((tail[0], tail[1]))
+   print(seen)
 
-   return (head, tails, seen)
+   return (head, knots, seen)
 
 
 def update_tail_y(direction, head, tail, seen):
+   print(f'--- ({direction}) Comparing head {head} and {tail}')
    if is_adjacent(head, tail):
+      print('ADJACENT, doing nothing')
       return (head, tail, seen)
 
-   tail[1] = head[1] - 1 if direction == 'U' else head[1] + 1
-   if tail[0] != head[0]:
-      tail[0] = head[0]
+   # tail[1] = head[1] - 1 if direction == 'U' else head[1] + 1
+   # if tail[0] != head[0]:
+   #    tail[0] = head[0]
+
+   if direction == 'U' and head[0] != tail[0]:
+      tail[0] += 1
+      tail[1] += 1
+   elif direction == 'U' and head[0] == tail[0]:
+      tail[1] += 1
+   elif direction == 'D' and head[0] != tail[0]:
+      tail[0] -= 1
+      tail[1] -= 1
+   elif direction == 'D' and head[0] == tail[0]:
+      tail[1] -= 1
+
    
-   seen.add((tail[0], tail[1]))
    return (head, tail, seen)
 
    
@@ -764,17 +795,15 @@ def is_adjacent(head, tail):
    else:
       return None 
 
-
-def part_1(commands):
+   
+def find_tail_seen(commands, knot_count):
    seen = set()
    seen.add((0, 0))
 
    head = [0, 0]
-   # tails = [[0, 0]]
-   tails = [[0,0] for _ in range(0, 9)]
+   tails = [[0,0] for _ in range(0, knot_count)]
    for (direction, amount) in commands:
       print()
-      print(direction, amount)
       if direction == 'U':
          for _ in range(0, amount):
             (head, tails, seen) = move_y(direction, head, tails, seen)
@@ -788,36 +817,21 @@ def part_1(commands):
          for _ in range(0, amount):
             (head, tails, seen) = move_x(direction, head, tails, seen)
 
+   return seen
 
+
+def part_1(commands):
+   seen = find_tail_seen(commands, 1)
    print('Part 1: ', len(seen))
 
 
-# def part_2(commands):
-#    seen = set()
-#    seen.add((0, 0))
-
-#    head = [0,0]
-#    tails = [[0,0] for _ in range(0, 9)]
-
-#    for (direction, amount) in commands:
-#       if direction == 'U':
-#          for _ in range(0, amount):
-#             (head, tails, seen) = move_y(direction, head, tails, seen)
-#       elif direction == 'R':
-#          for _ in range(0, amount):
-#             (head, tails, seen) = move_x(direction, head, tails, seen)
-#       elif direction == 'D':
-#          for _ in range(0, amount):
-#             (head, tails, seen) = move_y(direction, head, tails, seen)
-#       elif direction == 'L':
-#          for _ in range(0, amount):
-#             (head, tails, seen) = move_x(direction, head, tails, seen)
-
-#    print('Part 2: ', len(seen))
+def part_2(commands):
+   seen = find_tail_seen(commands, 9)
+   print('Part 2: ', len(seen))
 
 
 def read_input():
-   with open('day_09/input.txt') as f:
+   with open('day_09/input2.txt') as f:
       return [(direction, int(amount)) for line in f.readlines() for direction, amount in [line.split()]]
 
 
